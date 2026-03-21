@@ -4,397 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CASH PIN • MagicPAY</title>
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Favicon -->
     <link rel="icon" type="image/jpeg" href="https://raw.githubusercontent.com/Asiacell-Erthlink/CASH_PIN/refs/heads/main/CashPin.jpg">
     <style>
-        /* نفس التنسيقات السابقة مع إضافة القليل للرسائل */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: #0a0a0a;
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .app-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 16px;
-            background: #0f0f0f;
-            border-bottom: 1px solid #222;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .menu-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background: #1a1a1a;
-        }
-
-        .header-logo {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .header-logo img {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            object-fit: cover;
-            box-shadow: 0 0 15px rgba(255,255,255,0.3);
-            border: 2px solid rgba(255,255,255,0.5);
-        }
-
-        .header-logo span {
-            font-weight: 700;
-            font-size: 18px;
-            color: #eee;
-        }
-
-        .header-placeholder {
-            width: 40px;
-        }
-
-        .sidebar-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(4px);
-            z-index: 200;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: -280px;
-            width: 260px;
-            height: 100%;
-            background: #111;
-            border-right: 1px solid #2a2a2a;
-            z-index: 250;
-            transition: left 0.3s ease;
-            padding: 24px 16px;
-            overflow-y: auto;
-            box-shadow: 2px 0 20px rgba(0,0,0,0.7);
-        }
-
-        .sidebar.open {
-            left: 0;
-        }
-
-        .sidebar-overlay.open {
-            display: block;
-            opacity: 1;
-        }
-
-        .sidebar-logo {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 32px;
-        }
-
-        .sidebar-logo img {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 3px solid white;
-            box-shadow: 0 0 25px rgba(255,255,255,0.4);
-        }
-
-        .pending-title {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-            margin: 24px 0 16px;
-            color: #aaa;
-            text-transform: uppercase;
-            font-size: 13px;
-            letter-spacing: 0.5px;
-        }
-
-        .pending-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-height: 60vh;
-            overflow-y: auto;
-        }
-
-        .pending-item {
-            background: #1a1a1a;
-            border: 1px solid #2a2a2a;
-            border-radius: 16px;
-            padding: 14px;
-        }
-
-        .pending-code {
-            font-family: monospace;
-            font-size: 12px;
-            color: #ccc;
-            word-break: break-all;
-            margin-bottom: 8px;
-        }
-
-        .pending-status {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 30px;
-            background: #2a2a2a;
-            font-weight: 500;
-            font-size: 11px;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: #0a0a0a; color: #fff; min-height: 100vh; display: flex; flex-direction: column; }
+        .app-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #0f0f0f; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; }
+        .menu-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #1a1a1a; }
+        .header-logo { display: flex; align-items: center; gap: 8px; }
+        .header-logo img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 15px rgba(255,255,255,0.3); border: 2px solid rgba(255,255,255,0.5); }
+        .header-logo span { font-weight: 700; font-size: 18px; color: #eee; }
+        .header-placeholder { width: 40px; }
+        .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 200; display: none; opacity: 0; transition: opacity 0.3s; }
+        .sidebar { position: fixed; top: 0; left: -280px; width: 260px; height: 100%; background: #111; border-right: 1px solid #2a2a2a; z-index: 250; transition: left 0.3s ease; padding: 24px 16px; overflow-y: auto; box-shadow: 2px 0 20px rgba(0,0,0,0.7); }
+        .sidebar.open { left: 0; }
+        .sidebar-overlay.open { display: block; opacity: 1; }
+        .sidebar-logo { display: flex; justify-content: center; margin-bottom: 32px; }
+        .sidebar-logo img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 25px rgba(255,255,255,0.4); }
+        .pending-title { display: flex; align-items: center; gap: 8px; font-weight: 600; margin: 24px 0 16px; color: #aaa; text-transform: uppercase; font-size: 13px; letter-spacing: 0.5px; }
+        .pending-list { list-style: none; display: flex; flex-direction: column; gap: 12px; max-height: 60vh; overflow-y: auto; }
+        .pending-item { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 16px; padding: 14px; }
+        .pending-code { font-family: monospace; font-size: 12px; color: #ccc; word-break: break-all; margin-bottom: 8px; }
+        .pending-status { display: flex; align-items: center; justify-content: space-between; }
+        .status-badge { padding: 4px 8px; border-radius: 30px; background: #2a2a2a; font-weight: 500; font-size: 11px; }
         .status-badge.processing { background: #ffaa00; color: #000; }
         .status-badge.success { background: #00cc88; color: #000; }
         .status-badge.failed { background: #ff4d4d; color: #fff; }
-
-        .timer {
-            color: #ffaa00;
-            font-weight: 600;
-            font-size: 12px;
-        }
-
-        .new-op-btn-sidebar {
-            width: 100%;
-            background: #2a2a2a;
-            border: none;
-            border-radius: 40px;
-            padding: 14px;
-            color: white;
-            font-weight: 600;
-            margin-top: 24px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 16px;
-            background: #0a0a0a;
-        }
-
-        .payment-dialog {
-            max-width: 500px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .dialog-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, #fff, #aaa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .dialog-sub {
-            color: #888;
-            margin-bottom: 24px;
-            font-size: 14px;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .code-input {
-            background: #1a1a1a;
-            border: 1px solid #333;
-            border-radius: 40px;
-            padding: 16px 20px;
-            font-size: 15px;
-            color: white;
-            outline: none;
-            width: 100%;
-        }
-
-        .code-input:focus {
-            border-color: #fff;
-            box-shadow: 0 0 0 2px rgba(255,255,255,0.1);
-        }
-
-        .send-btn {
-            background: white;
-            color: black;
-            border: none;
-            border-radius: 40px;
-            padding: 16px;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-        }
-
-        .message-area {
-            background: #111;
-            border-radius: 24px;
-            padding: 20px;
-            border-left: 4px solid #fff;
-            margin-top: 16px;
-        }
-
-        .message-text {
-            line-height: 1.6;
-            color: #ddd;
-            font-size: 15px;
-        }
-
-        .countdown-timer {
-            background: #00000040;
-            border-radius: 40px;
-            padding: 12px 16px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            border: 1px solid #ffaa0040;
-            margin-top: 16px;
-            font-weight: 600;
-            width: 100%;
-            justify-content: center;
-        }
-
-        .warning-note {
-            color: #ffaa00;
-            font-size: 13px;
-            margin-top: 16px;
-            background: #ffaa0010;
-            padding: 12px;
-            border-radius: 16px;
-        }
-
-        .telegram-status {
-            font-size: 12px;
-            margin-top: 8px;
-            color: #888;
-        }
-
-        .admin-panel {
-            display: none;
-        }
-
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .admin-title {
-            font-size: 22px;
-            font-weight: 700;
-        }
-
-        .back-to-user {
-            background: #2a2a2a;
-            border: none;
-            color: white;
-            padding: 10px 16px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .admin-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: #1a1a1a;
-            border-radius: 16px;
-            padding: 16px;
-            border: 1px solid #2a2a2a;
-        }
-
-        .requests-table {
-            background: #1a1a1a;
-            border-radius: 20px;
-            padding: 16px;
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-
-        th {
-            text-align: left;
-            padding: 12px 4px;
-            color: #aaa;
-            font-weight: 500;
-            border-bottom: 1px solid #333;
-        }
-
-        td {
-            padding: 12px 4px;
-            border-bottom: 1px solid #222;
-        }
-
-        .action-btn {
-            background: #333;
-            border: none;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 30px;
-            font-size: 11px;
-            cursor: pointer;
-            margin: 2px;
-        }
-
+        .timer { color: #ffaa00; font-weight: 600; font-size: 12px; }
+        .new-op-btn-sidebar { width: 100%; background: #2a2a2a; border: none; border-radius: 40px; padding: 14px; color: white; font-weight: 600; margin-top: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .main-content { flex: 1; padding: 16px; background: #0a0a0a; }
+        .payment-dialog { max-width: 500px; margin: 0 auto; width: 100%; }
+        .dialog-title { font-size: 24px; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, #fff, #aaa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .dialog-sub { color: #888; margin-bottom: 24px; font-size: 14px; }
+        .input-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+        .code-input { background: #1a1a1a; border: 1px solid #333; border-radius: 40px; padding: 16px 20px; font-size: 15px; color: white; outline: none; width: 100%; }
+        .code-input:focus { border-color: #fff; box-shadow: 0 0 0 2px rgba(255,255,255,0.1); }
+        .send-btn { background: white; color: black; border: none; border-radius: 40px; padding: 16px; font-weight: 700; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
+        .message-area { background: #111; border-radius: 24px; padding: 20px; border-left: 4px solid #fff; margin-top: 16px; }
+        .message-text { line-height: 1.6; color: #ddd; font-size: 15px; }
+        .countdown-timer { background: #00000040; border-radius: 40px; padding: 12px 16px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid #ffaa0040; margin-top: 16px; font-weight: 600; width: 100%; justify-content: center; }
+        .warning-note { color: #ffaa00; font-size: 13px; margin-top: 16px; background: #ffaa0010; padding: 12px; border-radius: 16px; }
+        .telegram-status { font-size: 12px; margin-top: 8px; color: #888; text-align: center; }
+        .admin-panel { display: none; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .admin-title { font-size: 22px; font-weight: 700; }
+        .back-to-user { background: #2a2a2a; border: none; color: white; padding: 10px 16px; border-radius: 40px; cursor: pointer; font-size: 14px; }
+        .admin-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: #1a1a1a; border-radius: 16px; padding: 16px; border: 1px solid #2a2a2a; }
+        .requests-table { background: #1a1a1a; border-radius: 20px; padding: 16px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { text-align: left; padding: 12px 4px; color: #aaa; font-weight: 500; border-bottom: 1px solid #333; }
+        td { padding: 12px 4px; border-bottom: 1px solid #222; }
+        .action-btn { background: #333; border: none; color: white; padding: 4px 8px; border-radius: 30px; font-size: 11px; cursor: pointer; margin: 2px; }
         .action-btn.success { background: #00aa66; }
         .action-btn.danger { background: #aa3333; }
     </style>
@@ -448,26 +110,20 @@
         </div>
         <div class="admin-stats" id="adminStats"></div>
         <div class="requests-table">
-            <table>
-                <thead><tr><th>Code</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+             <table>
+                <thead>
+                    <tr><th>Code</th><th>Status</th><th>Created</th><th>Actions</th></tr>
+                </thead>
                 <tbody id="adminTableBody"></tbody>
-            </table>
+             </table>
         </div>
     </main>
 
     <script>
         (function() {
             // ========== CONFIG ==========
-            const BOT_TOKEN = '8094856271:AAFdutCJAsHntdIByvaumPDFkwfRU14niCE';
-            const CHAT_ID = '@CASH_PIN'; // Replace with actual chat ID (channel or user)
-
-            // قائمة الوكلاء (CORS proxies) - سيتم تجربتها تباعاً
-            const PROXY_LIST = [
-                'https://corsproxy.io/?',
-                'https://api.allorigins.win/raw?url=',
-                'https://thingproxy.freeboard.io/fetch/',
-                'https://cors-anywhere.herokuapp.com/' // قد يتطلب تفعيلاً مؤقتاً
-            ];
+            // API endpoint (Vercel serverless function)
+            const API_URL = '/api/sendTelegram';
 
             // #Key's_Here🔑
             const VALID_KEYS = [
@@ -554,44 +210,28 @@
                 pendingListEl.innerHTML = html;
             }
 
-            // ========== TELEGRAM SENDER WITH MULTIPLE PROXIES ==========
-            async function sendTelegramMessage(text, retryCount = 0) {
-                const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+            // ========== TELEGRAM SENDER VIA VERCEL API ==========
+            async function sendTelegramMessage(text) {
                 const payload = {
-                    chat_id: CHAT_ID,
+                    chat_id: '@CASH_PIN', // Change to your channel username or user ID
                     text: text,
                     parse_mode: 'Markdown'
                 };
 
-                if (retryCount >= PROXY_LIST.length) {
-                    // All proxies failed
-                    console.error('All proxies failed for Telegram message');
-                    telegramStatus.innerText = '⚠️ Could not send Telegram notification (all proxies failed)';
-                    // Store in localStorage for later retry (optional)
-                    const failedMessages = JSON.parse(localStorage.getItem('failed_telegram') || '[]');
-                    failedMessages.push({ text, timestamp: Date.now() });
-                    localStorage.setItem('failed_telegram', JSON.stringify(failedMessages));
-                    return;
-                }
-
-                const proxy = PROXY_LIST[retryCount];
-                const fullUrl = proxy + encodeURIComponent(url);
-
                 try {
-                    const response = await fetch(fullUrl, {
+                    const response = await fetch(API_URL, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
                     });
                     const data = await response.json();
                     if (!data.ok) throw new Error(data.description);
-                    console.log('Telegram message sent via', proxy);
+                    console.log('Telegram message sent via Vercel');
                     telegramStatus.innerText = '✅ Telegram notification sent';
                     setTimeout(() => { telegramStatus.innerText = ''; }, 3000);
                 } catch (error) {
-                    console.warn(`Proxy ${retryCount} failed:`, error);
-                    // Try next proxy
-                    await sendTelegramMessage(text, retryCount + 1);
+                    console.error('API error:', error);
+                    telegramStatus.innerText = '❌ Failed to send Telegram notification';
                 }
             }
 
@@ -726,16 +366,18 @@
                 let rows = '';
                 requests.forEach(req => {
                     const created = new Date(req.createdAt).toLocaleTimeString();
-                    rows += `<tr>
-                        <td><code>${req.code.substring(0,20)}...</code></td>
-                        <td><span class="status-badge ${req.status}">${req.status}</span></td>
-                        <td>${created}</td>
-                        <td>
-                            <button class="action-btn success" onclick="window.markSuccess('${req.id}')">✓</button>
-                            <button class="action-btn" onclick="window.markProcessing('${req.id}')">↻</button>
-                            <button class="action-btn danger" onclick="window.deleteRequest('${req.id}')">✗</button>
-                        </td>
-                    </tr>`;
+                    rows += `
+                        <tr>
+                            <td><code>${req.code.substring(0,20)}...</code></td>
+                            <td><span class="status-badge ${req.status}">${req.status}</span></td>
+                            <td>${created}</td>
+                            <td>
+                                <button class="action-btn success" onclick="window.markSuccess('${req.id}')">✓</button>
+                                <button class="action-btn" onclick="window.markProcessing('${req.id}')">↻</button>
+                                <button class="action-btn danger" onclick="window.deleteRequest('${req.id}')">✗</button>
+                            </td>
+                        </tr>
+                    `;
                 });
                 adminTableBody.innerHTML = rows || '<tr><td colspan="4" style="text-align:center;">No requests</td></tr>';
                 renderAdminStats();
@@ -775,19 +417,6 @@
             });
 
             backToUserBtn.addEventListener('click', exitAdminMode);
-
-            // ========== RETRY FAILED MESSAGES (optional) ==========
-            function retryFailedMessages() {
-                const failed = JSON.parse(localStorage.getItem('failed_telegram') || '[]');
-                if (failed.length > 0) {
-                    failed.forEach(item => {
-                        sendTelegramMessage(item.text);
-                    });
-                    localStorage.removeItem('failed_telegram');
-                }
-            }
-            // Retry every 30 seconds if there are failed messages
-            setInterval(retryFailedMessages, 30000);
 
             // ========== INIT ==========
             loadRequests();
