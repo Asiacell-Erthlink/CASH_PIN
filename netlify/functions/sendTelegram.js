@@ -22,7 +22,7 @@ exports.handler = async (event, context) => {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing chat_id or text' }) };
     }
 
-    const botToken = '8094856271:AAFdutCJAsHntdIByvaumPDFkwfRU14niCE';
+    const botToken = '8094856271:AAEb3rPP4nnWJrukdqWF9hgLJuhzmBJOTdA';
     const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
 
     const response = await fetch(url, {
